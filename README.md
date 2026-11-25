@@ -268,6 +268,7 @@ docker buildx build \
 - **Source build with patched Go toolchain:** Compiling `cloudflared` directly from official release tags with the latest Go `1.27.x` eliminates stale Go stdlib/module CVEs.
 - **Static Go healthcheck binary:** Replaces external host `busybox` bind mounts with a self-contained, zero-dependency HTTP readiness probe inside the image.
 - **Hadolint `DL3008` ignore:** Daily `--no-cache` security rebuilds intentionally pull the newest Debian 13 security updates via `apt-get` rather than pinning stale distro package versions.
+- **Dive `highestUserWastedPercent: 0.18`:** Overall image efficiency remains strictly gated at `>= 95%` (measured ~97.8%). Because daily `apt-get -y upgrade` and `debconf` updates on `debian:trixie-slim` legitimately replace ~5 MB of base-layer files against a compact ~38 MB user layer (~13.5% of user bytes), `highestUserWastedPercent` is tuned to `0.18` rather than squashing away shared Debian base layers.
 
 ---
 

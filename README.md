@@ -31,8 +31,8 @@ A source-built, non-root container image for **Cloudflare Tunnel (`cloudflared`)
 | cloudflared | `2026.11.2` |
 | Go toolchain | `1.27.4` |
 | Base OS | `Debian 13.8 (trixie-slim)` |
-| Last verified build (UTC) | `2026-11-24` |
-| Security gate (Trivy + Grype) | **0 fixable Critical/High** (0 upstream-unfixed) |
+| Last verified build (UTC) | `2026-11-25` |
+| Security gate (Trivy + Grype) | **0 fixable Critical/High** (13 upstream-unfixed) |
 <!-- versions:end -->
 
 ---

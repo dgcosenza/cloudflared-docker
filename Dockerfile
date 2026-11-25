@@ -1,14 +1,17 @@
 # syntax=docker/dockerfile:1.7
 
+ARG GO_BASE=golang:1.27.4-trixie@sha256:430985542100b871e108ccc00e8dcc5eef08ca14ee5825e98ebf563d8ffec4ee
+ARG DEBIAN_BASE=debian:trixie-slim@sha256:8aa5a7bf5a1955bddbe7d74fcdd0b91ab30e74362a8b73af672b0481b35b44a0
 ARG GO_VERSION=1.27.4
-ARG DEBIAN_BASE=debian:trixie-slim
 ARG CLOUDFLARED_VERSION=2026.11.2
 
 # ---- Stage 1: build cloudflared and healthcheck binary from official source ----
-FROM golang:${GO_VERSION}-trixie AS builder
+FROM ${GO_BASE} AS builder
 
 ARG CLOUDFLARED_VERSION
+ARG TARGETARCH
 ARG BUILD_DATE=unknown
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
     && apt-get -y upgrade \
@@ -27,13 +30,12 @@ WORKDIR /src/cloudflared
 # GOTOOLCHAIN=local ensures the patched builder Go toolchain is always used.
 ENV CGO_ENABLED=0 \
     GOOS=linux \
-    GOARCH=amd64 \
     GOTOOLCHAIN=local \
     GOFIPS140=off \
     CONTAINER_BUILD=1
 
-RUN go mod download \
-    && go build -trimpath -mod=readonly \
+RUN GOARCH="${TARGETARCH:-amd64}" go mod download \
+    && GOARCH="${TARGETARCH:-amd64}" go build -trimpath -mod=readonly \
       -ldflags="-s -w -X 'main.Version=${CLOUDFLARED_VERSION}' -X 'main.BuildTime=${BUILD_DATE}' -X 'github.com/cloudflare/cloudflared/metrics.Runtime=virtual'" \
       -o /out/cloudflared \
       ./cmd/cloudflared
@@ -41,7 +43,7 @@ RUN go mod download \
 # Build tiny dependency-free HTTP healthcheck helper
 COPY healthcheck/ /src/healthcheck/
 WORKDIR /src/healthcheck
-RUN go build -trimpath -ldflags="-s -w" -o /out/cloudflared-healthcheck ./main.go
+RUN GOARCH="${TARGETARCH:-amd64}" go build -trimpath -ldflags="-s -w" -o /out/cloudflared-healthcheck ./main.go
 
 # ---- Stage 2: hardened Debian 13 (trixie-slim) runtime ----
 FROM ${DEBIAN_BASE} AS runtime
@@ -57,16 +59,14 @@ RUN apt-get update \
     && apt-get -y upgrade \
     && apt-get install -y --no-install-recommends ca-certificates tini tzdata \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-RUN groupadd --gid 65532 nonroot \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && groupadd --gid 65532 nonroot \
     && useradd --uid 65532 --gid 65532 --create-home --home-dir /home/nonroot \
        --shell /usr/sbin/nologin --comment 'Cloudflared non-root user' nonroot \
     && install -d -m 0750 -o 65532 -g 65532 /etc/cloudflared
 
-COPY --from=builder --chown=0:0 /out/cloudflared /usr/local/bin/cloudflared
-COPY --from=builder --chown=0:0 /out/cloudflared-healthcheck /usr/local/bin/cloudflared-healthcheck
-RUN chmod 0755 /usr/local/bin/cloudflared /usr/local/bin/cloudflared-healthcheck
+COPY --from=builder --chown=0:0 --chmod=0755 /out/cloudflared /usr/local/bin/cloudflared
+COPY --from=builder --chown=0:0 --chmod=0755 /out/cloudflared-healthcheck /usr/local/bin/cloudflared-healthcheck
 
 ENV NO_AUTOUPDATE=true \
     SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
@@ -82,14 +82,14 @@ ENTRYPOINT ["/usr/bin/tini", "--", "cloudflared"]
 CMD ["version"]
 
 LABEL org.opencontainers.image.title="Cloudflared (Debian 13)" \
-      org.opencontainers.image.description="Source-built Cloudflare Tunnel (cloudflared) container image on Debian 13 (trixie-slim), maintained by Daniel G. Cosenza from FNX Labs." \
+      org.opencontainers.image.description="Source-built multi-arch Cloudflare Tunnel (cloudflared) container image on Debian 13 (trixie-slim), maintained by Daniel G. Cosenza from FNX Labs." \
       org.opencontainers.image.url="https://hub.docker.com/r/dgcosenza/cloudflared" \
       org.opencontainers.image.source="${IMAGE_SOURCE}" \
       org.opencontainers.image.documentation="${IMAGE_SOURCE}#readme" \
       org.opencontainers.image.version="${CLOUDFLARED_VERSION}" \
       org.opencontainers.image.revision="${IMAGE_REVISION}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.licenses="Apache-2.0 AND MIT" \
       org.opencontainers.image.vendor="Daniel G. Cosenza from FNX Labs" \
       org.opencontainers.image.authors="Daniel G. Cosenza from FNX Labs" \
       org.opencontainers.image.base.name="debian:trixie-slim" \

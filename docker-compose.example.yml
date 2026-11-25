@@ -1,20 +1,26 @@
-# Example Docker Compose configuration for dgcosenza/cloudflared
+# Hardened Docker Compose configuration for dgcosenza/cloudflared
 # Pin by @sha256 digest in production and keep TUNNEL_TOKEN in a .env or secret file.
+# Available identically on Docker Hub (dgcosenza/cloudflared) and GHCR (ghcr.io/dgcosenza/cloudflared).
 
 services:
   cloudflared:
     image: dgcosenza/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
     security_opt:
       - no-new-privileges:true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=16m
     command: tunnel --protocol http2 --metrics 127.0.0.1:2000 run
     environment:
       - TZ=Etc/UTC
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
     volumes:
-      # Optional: local configuration/credentials directory (must be readable by UID/GID 65532)
-      - ./tunnel:/etc/cloudflared
+      # Optional: local configuration/credentials directory (read-only when using TUNNEL_TOKEN)
+      - ./tunnel:/etc/cloudflared:ro
     healthcheck:
       test: ["CMD", "/usr/local/bin/cloudflared-healthcheck"]
       interval: 30s

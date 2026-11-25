@@ -598,11 +598,18 @@ jobs:
           subject-digest: ${{ steps.index.outputs.index_digest }}
           push-to-registry: true
 
+      - name: Attest SLSA Build L3 provenance (release checksums)
+        id: attest_release
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: '.rel/checksums.txt'
+
       - name: Publish signed GitHub Release with SBOMs and checksums
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.index.outputs.date_tag }}
+          BUNDLE_PATH: ${{ steps.attest_release.outputs.bundle-path }}
           VER: ${{ needs.resolve.outputs.cloudflared_version }}
           INDEX_DIGEST: ${{ steps.index.outputs.index_digest }}
           DIG_AMD64: ${{ steps.index.outputs.amd64_digest }}
@@ -633,6 +640,7 @@ jobs:
             } > checksums.txt
             cosign sign-blob --yes --bundle checksums.txt.sigstore.json checksums.txt
           )
+          cp "$BUNDLE_PATH" .rel/checksums.txt.intoto.jsonl
 
           cat > .rel/notes.md <<EOF
           ## Cloudflared ${VER} (${TAG})
@@ -662,14 +670,14 @@ jobs:
           if gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release edit "$TAG" -R "$GITHUB_REPOSITORY" --title "cloudflared ${VER} (${TAG})" --notes-file .rel/notes.md
             gh release upload "$TAG" -R "$GITHUB_REPOSITORY" --clobber \
-              .rel/checksums.txt .rel/checksums.txt.sigstore.json \
+              .rel/checksums.txt .rel/checksums.txt.sigstore.json .rel/checksums.txt.intoto.jsonl \
               .rel/sbom-amd64.spdx.json .rel/sbom-amd64.cdx.json \
               .rel/sbom-arm64.spdx.json .rel/sbom-arm64.cdx.json
           else
             gh release create "$TAG" -R "$GITHUB_REPOSITORY" \
               --title "cloudflared ${VER} (${TAG})" \
               --notes-file .rel/notes.md \
-              .rel/checksums.txt .rel/checksums.txt.sigstore.json \
+              .rel/checksums.txt .rel/checksums.txt.sigstore.json .rel/checksums.txt.intoto.jsonl \
               .rel/sbom-amd64.spdx.json .rel/sbom-amd64.cdx.json \
               .rel/sbom-arm64.spdx.json .rel/sbom-arm64.cdx.json
           fi

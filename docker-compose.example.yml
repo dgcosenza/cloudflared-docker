@@ -1,0 +1,31 @@
+# Example Docker Compose configuration for dgcosenza/cloudflared
+# Pin by @sha256 digest in production and keep TUNNEL_TOKEN in a .env or secret file.
+
+services:
+  cloudflared:
+    image: dgcosenza/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command: tunnel --protocol http2 --metrics 127.0.0.1:2000 run
+    environment:
+      - TZ=Etc/UTC
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    volumes:
+      # Optional: local configuration/credentials directory (must be readable by UID/GID 65532)
+      - ./tunnel:/etc/cloudflared
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/cloudflared-healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 256M
+        reservations:
+          cpus: "0.10"
+          memory: 64M

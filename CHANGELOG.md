@@ -13,7 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Mai
 - Verified components: cloudflared `2026.11.2`, Go toolchain `1.27.4`, Base OS `Debian 13.8 (trixie-slim)`.
 - Upstream status: no new upstream release since previous build; refreshed base OS and dependencies.
 - Vulnerability gate: **0 fixable Critical/High** in Trivy and Grype (13 upstream-unfixed).
-
+- Published digest: `dgcosenza/cloudflared@sha256:abc966a36cc663e3db3bb9f8cd041b0cb0feb3f3dced758f95e95de32c98b63b`.
 ---
 
 ## [2026.11.2] — 2026-11-24

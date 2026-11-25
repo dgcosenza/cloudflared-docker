@@ -787,9 +787,14 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add versions.json README.md CHANGELOG.md
             git commit -m "chore(docs): update daily build metadata and changelog [skip ci]"
+            BRANCH="bot/docs-${GITHUB_RUN_ID}"
+            git checkout -b "$BRANCH"
             git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-            git pull --rebase origin main
-            git push origin HEAD:main
+            git push origin "$BRANCH"
+            PR_URL="$(gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$BRANCH" --title "chore(docs): update daily build metadata and changelog" --body "Automated documentation update from daily build ${GITHUB_RUN_ID}.")"
+            echo "Created PR: $PR_URL"
+            gh pr merge --repo "$GITHUB_REPOSITORY" --auto --squash "$BRANCH"
+            gh workflow run daily.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH" || true
           else
             echo "No documentation or version metadata changes to commit."
           fi

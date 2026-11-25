@@ -1,9 +1,21 @@
 {
   "image": "dgcosenza/cloudflared",
   "upstream_name": "cloudflare/cloudflared",
+  "upstream_license": "Apache-2.0",
+  "packaging_license": "MIT",
   "upstream_version": "2026.11.2",
   "upstream_commit": "",
   "changelog_version": "2026.11.2",
+  "architectures": [
+    "linux/amd64",
+    "linux/arm64"
+  ],
+  "sizes_mb": {
+    "amd64": "44.6",
+    "arm64": "136.9"
+  },
+  "signed": true,
+  "slsa_provenance": true,
   "components": {
     "cloudflared": "2026.11.2",
     "Go toolchain": "1.27.4",
@@ -13,8 +25,9 @@
   "base_digest": "sha256:8aa5a7bf5a1955bddbe7d74fcdd0b91ab30e74362a8b73af672b0481b35b44a0",
   "debian_version": "13.8",
   "build_date": "2026-11-25",
-  "built_at_utc": "2026-11-25T03:41:24Z",
-  "image_digest": "dgcosenza/cloudflared@sha256:abc966a36cc663e3db3bb9f8cd041b0cb0feb3f3dced758f95e95de32c98b63b",
+  "built_at_utc": "2026-11-25T07:50:40Z",
+  "image_digest": "dgcosenza/cloudflared@sha256:6f61d5ab111dd778ef3b9583a414fe5d39b24d1d7b2675ff804b7bb550574059",
+  "ghcr_digest": "ghcr.io/dgcosenza/cloudflared@sha256:6f61d5ab111dd778ef3b9583a414fe5d39b24d1d7b2675ff804b7bb550574059",
   "fixable_critical_high": 0,
   "unfixed_cves": [
     "CVE-2025-69720",

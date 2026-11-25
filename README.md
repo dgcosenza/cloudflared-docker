@@ -42,8 +42,8 @@ A source-built, multi-arch, rootless container image for **Cloudflare Tunnel (`c
 | Architectures | `linux/amd64, linux/arm64` |
 | Uncompressed size (per arch) | `amd64: 45.4 MB, arm64: 139.4 MB` |
 | Last verified build (UTC) | `2026-11-25` |
-| Published multi-arch digest | `dgcosenza/cloudflared@sha256:64c6a9d3db840ba791123871cd238b44aa78bcad27747246e2051ec59c097926` |
-| GHCR mirror | `ghcr.io/dgcosenza/cloudflared@sha256:64c6a9d3db840ba791123871cd238b44aa78bcad27747246e2051ec59c097926` |
+| Published multi-arch digest | `dgcosenza/cloudflared@sha256:cf17dcdb30bc9eced733cc54cf43b5614b491fad9f23b9aba5873bbad8f3d8b1` |
+| GHCR mirror | `ghcr.io/dgcosenza/cloudflared@sha256:cf17dcdb30bc9eced733cc54cf43b5614b491fad9f23b9aba5873bbad8f3d8b1` |
 | Supply chain | Cosign OIDC signed + SPDX & CycloneDX SBOM attestations + SLSA Build L3 provenance |
 | Security gate (Trivy + Grype on SBOM) | **0 fixable Critical/High** (13 upstream-unfixed) |
 <!-- versions:end -->

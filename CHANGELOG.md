@@ -13,9 +13,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Mai
 - Verified components: cloudflared `2026.11.2`, Go toolchain `1.27.4`, Base OS `Debian 13.8 (trixie-slim)`.
 - Architectures verified: `linux/amd64, linux/arm64` (native smoke tests + Dive efficiency gate).
 - Upstream status: no new upstream release since previous build; refreshed base OS and dependencies.
-- Vulnerability gate: **0 fixable Critical/High** in Trivy and Grype (SBOM scan) (13 upstream-unfixed).
-- Published multi-arch digest (Docker Hub + GHCR): `dgcosenza/cloudflared@sha256:a34390c847e766a6d3efb1ede719f64bd346aba2c5e1368dd12df3b3723a0bd0` (Cosign OIDC signed + SPDX/CycloneDX SBOM + SLSA L3 provenance).
-
+- Vulnerability gate: **0 fixable findings of any severity** in Trivy and Grype (SBOM scan) (13 upstream-unfixed).
+- Published multi-arch digest (Docker Hub + GHCR): `dgcosenza/cloudflared@sha256:219ecc6df128388ef42bf26188ebcc11f8016550efef37ed4c384f99e75dbe08` (Cosign OIDC signed + SPDX/CycloneDX SBOM + SLSA L3 provenance).
 ---
 
 ## [2026.11.2] — 2026-11-25

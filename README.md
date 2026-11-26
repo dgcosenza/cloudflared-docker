@@ -27,7 +27,7 @@ A source-built, multi-arch, rootless container image for **Cloudflare Tunnel (`c
 - **Drop-in replacement for `cloudflare/cloudflared`:** Preserves UID/GID `65532:65532` (`nonroot`), `/home/nonroot`, `/etc/cloudflared`, `NO_AUTOUPDATE=true`, and the `cloudflared` CLI entrypoint (wrapped with `tini` as PID 1).
 - **Rootless & read-only rootfs ready:** Verified under `--read-only --cap-drop ALL --security-opt no-new-privileges:true`.
 - **Zero-dependency built-in healthcheck:** Ships `/usr/local/bin/cloudflared-healthcheck` (a tiny static Go binary) probing `http://127.0.0.1:2000/ready` by default — eliminating the need to bind-mount host `busybox`, `curl`, or `wget` just to check tunnel readiness.
-- **Hardened supply chain:** Hadolint + Gitleaks preflight, native multi-arch smoke tests, Dive layer-efficiency gate (`>= 95%`), Syft SPDX + CycloneDX SBOMs, Trivy + Grype (SBOM) zero-fixable High/Critical gates, Cosign keyless OIDC signatures & SBOM attestations, SLSA Build L3 provenance, dual-registry publishing, and signed GitHub Releases.
+- **Hardened supply chain:** Hadolint + Gitleaks preflight, native multi-arch smoke tests, Dive layer-efficiency gate (`>= 95%`), Syft SPDX + CycloneDX SBOMs, Trivy + Grype (SBOM) zero-fixable all-severity gates, Cosign keyless OIDC signatures & SBOM attestations, SLSA Build L3 provenance, dual-registry publishing, and signed GitHub Releases.
 
 ---
 
@@ -219,7 +219,7 @@ gh attestation verify oci://ghcr.io/dgcosenza/cloudflared:latest --owner dgcosen
 
 - **Preflight gates:** Every push and PR runs **Hadolint** (blocking on warning+), **Gitleaks** secret scanning across git history, and **public-content/attribution** checks.
 - **Vulnerability scan policy (all severities with a fix):** Every build generates **SPDX** and **CycloneDX** SBOMs with **Syft** per architecture, scans with **Trivy** (table, JSON, SARIF upload to GitHub Code Scanning, and blocking `--ignore-unfixed` gate) and **Grype** scanning the generated SPDX SBOM (`--only-fixed`, severity cutoff `negligible`, blocking gate), and enforces a **Dive** efficiency gate (`>= 95%`, `<= 5%` wasted space). Publication is blocked on any fixable finding of any severity.
-- **Current status:** **0 fixable findings of any severity** vulnerabilities across Debian 13 OS packages and compiled Go modules. Any upstream-unfixed advisories (if present) are recorded in CI artifacts (`trivy-report-*`) and automatically cleared on daily rebuilds once fixes are published.
+- **Current status:** **0 fixable vulnerabilities of any severity** across Debian 13 OS packages and compiled Go modules. Any upstream-unfixed advisories (if present) are recorded in CI artifacts (`trivy-report-*`) and automatically cleared on daily rebuilds once fixes are published.
 - **Dependency automation:** Renovate (`renovate.json`) pins base image digests and GitHub Action commit SHAs; Dependabot security alerts and OpenSSF Scorecard monitoring are enabled.
 - See [`SECURITY.md`](https://github.com/dgcosenza/cloudflared-docker/blob/main/SECURITY.md) for reporting guidelines.
 

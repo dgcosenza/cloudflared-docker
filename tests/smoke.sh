@@ -87,4 +87,29 @@ if docker run --rm --network host "${HARDENED_FLAGS[@]}" \
   exit 1
 fi
 
-echo "Smoke test passed (uid=65532, gid=65532, read-only, cap-drop=ALL, pid1=tini, healthcheck positive+negative ok)."
+# 5. Start a detached container using the image's built-in HEALTHCHECK instruction
+#    and wait until Docker itself reports status=healthy.
+docker run -d --name "$NAME" --network host "${HARDENED_FLAGS[@]}" \
+  -e CLOUDFLARED_HEALTHCHECK_URL="http://127.0.0.1:18200/ready" \
+  --entrypoint /usr/bin/tini "$IMAGE" -- /bin/sh -c 'sleep 120' >/dev/null
+
+HEALTH_STATUS=""
+for _ in $(seq 1 45); do
+  HEALTH_STATUS="$(docker inspect --format '{{.State.Health.Status}}' "$NAME" 2>/dev/null || echo starting)"
+  if [ "$HEALTH_STATUS" = "healthy" ]; then
+    break
+  fi
+  if [ "$HEALTH_STATUS" = "unhealthy" ]; then
+    echo "ERROR: container became unhealthy" >&2
+    docker inspect --format '{{json .State.Health}}' "$NAME" >&2 || true
+    exit 1
+  fi
+  sleep 2
+done
+if [ "$HEALTH_STATUS" != "healthy" ]; then
+  echo "ERROR: container did not reach Docker healthy status (last=${HEALTH_STATUS})" >&2
+  docker inspect --format '{{json .State.Health}}' "$NAME" >&2 || true
+  exit 1
+fi
+
+echo "Smoke test passed (uid=65532, gid=65532, read-only, cap-drop=ALL, pid1=tini, docker health=${HEALTH_STATUS}, positive+negative ok)."

@@ -10,7 +10,7 @@ Only the latest daily build of `dgcosenza/cloudflared` built from the latest off
 
 Every build in GitHub Actions is compiled from official upstream source with a current Go toolchain and scanned with both **Trivy** and **Grype**, plus an **SPDX SBOM** artifact:
 
-- **Hard gate:** Builds fail and refuse publication if either Trivy (`--ignore-unfixed`) or Grype (`--only-fixed`, severity cutoff `high`) detects any **fixable `CRITICAL` or `HIGH`** vulnerability in OS packages or Go modules.
+- **Hard gate:** Builds fail and refuse publication if either Trivy (`--ignore-unfixed`) or Grype (`--only-fixed --fail-on negligible`, all severities) detects any **fixable vulnerability of any severity** in OS packages or Go modules.
 - **Daily rebuilds:** Scheduled daily builds run with `--no-cache`, apply `apt-get update && apt-get -y upgrade`, and resolve the latest official `cloudflared` release and Go toolchain.
 - **Unfixed advisories:** Advisories without an upstream vendor fix are recorded in CI artifacts (`trivy-report`) and cleared automatically once Debian Security or upstream releases a fix.
 

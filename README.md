@@ -219,7 +219,7 @@ gh attestation verify oci://ghcr.io/dgcosenza/cloudflared:latest --owner dgcosen
 
 - **Preflight gates:** Every push and PR runs **Hadolint** (blocking on warning+), **Gitleaks** secret scanning across git history, and **public-content/attribution** checks.
 - **Vulnerability scan policy (all severities with a fix):** Every build generates **SPDX** and **CycloneDX** SBOMs with **Syft** per architecture, scans with **Trivy** (table, JSON, SARIF upload to GitHub Code Scanning, and blocking `--ignore-unfixed` gate) and **Grype** scanning the generated SPDX SBOM (`--only-fixed`, severity cutoff `negligible`, blocking gate), and enforces a **Dive** efficiency gate (`>= 95%`, `<= 5%` wasted space). Publication is blocked on any fixable finding of any severity.
-- **Current status:** **0 fixable findings of any severity** vulnerabilities across Debian 13 OS packages and compiled Go modules. Any upstream-unfixed advisories (if present) are recorded in CI artifacts (`trivy-report-*`) and automatically cleared on daily rebuilds once fixes are published.
+- **Current status:** **0 fixable vulnerabilities of any severity** across Debian 13 OS packages and compiled Go modules. Any upstream-unfixed advisories (if present) are recorded in CI artifacts (`trivy-report-*`) and automatically cleared on daily rebuilds once fixes are published.
 - **Dependency automation:** Renovate (`renovate.json`) pins base image digests and GitHub Action commit SHAs; Dependabot security alerts and OpenSSF Scorecard monitoring are enabled.
 - See [`SECURITY.md`](https://github.com/dgcosenza/cloudflared-docker/blob/main/SECURITY.md) for reporting guidelines.
 

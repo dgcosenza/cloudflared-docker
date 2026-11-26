@@ -27,7 +27,7 @@ A source-built, multi-arch, rootless container image for **Cloudflare Tunnel (`c
 - **Drop-in replacement for `cloudflare/cloudflared`:** Preserves UID/GID `65532:65532` (`nonroot`), `/home/nonroot`, `/etc/cloudflared`, `NO_AUTOUPDATE=true`, and the `cloudflared` CLI entrypoint (wrapped with `tini` as PID 1).
 - **Rootless & read-only rootfs ready:** Verified under `--read-only --cap-drop ALL --security-opt no-new-privileges:true`.
 - **Zero-dependency built-in healthcheck:** Ships `/usr/local/bin/cloudflared-healthcheck` (a tiny static Go binary) probing `http://127.0.0.1:2000/ready` by default — eliminating the need to bind-mount host `busybox`, `curl`, or `wget` just to check tunnel readiness.
-- **Hardened supply chain:** Hadolint + Gitleaks preflight, native multi-arch smoke tests, Dive layer-efficiency gate (`>= 95%`), Syft SPDX + CycloneDX SBOMs, Trivy + Grype (SBOM) zero-fixable High/Critical gates, Cosign keyless OIDC signatures & SBOM attestations, SLSA Build L3 provenance, dual-registry publishing, and signed GitHub Releases.
+- **Hardened supply chain:** Hadolint + Gitleaks preflight, native multi-arch smoke tests, Dive layer-efficiency gate (`>= 95%`), Syft SPDX + CycloneDX SBOMs, Trivy + Grype (SBOM) zero-fixable all-severity gates, Cosign keyless OIDC signatures & SBOM attestations, SLSA Build L3 provenance, dual-registry publishing, and signed GitHub Releases.
 
 ---
 

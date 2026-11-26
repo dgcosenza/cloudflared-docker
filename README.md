@@ -41,11 +41,11 @@ A source-built, multi-arch, rootless container image for **Cloudflare Tunnel (`c
 | Base OS | `Debian 13.8 (trixie-slim)` |
 | Architectures | `linux/amd64, linux/arm64` |
 | Uncompressed size (per arch) | `amd64: 45.4 MB, arm64: 139.4 MB` |
-| Last verified build (UTC) | `2026-11-25` |
-| Published multi-arch digest | `dgcosenza/cloudflared@sha256:da77bb216647a3f63c606ba743698f438f6a37051761e476c1dbfeda0a6417b8` |
-| GHCR mirror | `ghcr.io/dgcosenza/cloudflared@sha256:da77bb216647a3f63c606ba743698f438f6a37051761e476c1dbfeda0a6417b8` |
+| Last verified build (UTC) | `2026-11-26` |
+| Published multi-arch digest | `dgcosenza/cloudflared@sha256:a34390c847e766a6d3efb1ede719f64bd346aba2c5e1368dd12df3b3723a0bd0` |
+| GHCR mirror | `ghcr.io/dgcosenza/cloudflared@sha256:a34390c847e766a6d3efb1ede719f64bd346aba2c5e1368dd12df3b3723a0bd0` |
 | Supply chain | Cosign OIDC signed + SPDX & CycloneDX SBOM attestations + SLSA Build L3 provenance |
-| Security gate (Trivy + Grype on SBOM) | **0 fixable findings of any severity** (13 upstream-unfixed) |
+| Security gate (Trivy + Grype on SBOM) | **0 fixable Critical/High** (13 upstream-unfixed) |
 <!-- versions:end -->
 
 ---

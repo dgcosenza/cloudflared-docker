@@ -330,7 +330,7 @@ jobs:
           image-ref: '${{ env.IMAGE_NAME }}:ci-candidate-${{ matrix.arch }}'
           format: 'table'
           vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
           exit-code: '0'
           output: 'trivy-report-${{ matrix.arch }}.txt'
 
@@ -340,7 +340,7 @@ jobs:
           image-ref: '${{ env.IMAGE_NAME }}:ci-candidate-${{ matrix.arch }}'
           format: 'json'
           vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
           exit-code: '0'
           output: 'trivy-report-${{ matrix.arch }}.json'
 
@@ -354,7 +354,7 @@ jobs:
           image-ref: '${{ env.IMAGE_NAME }}:ci-candidate-${{ matrix.arch }}'
           format: 'sarif'
           vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
           ignore-unfixed: true
           output: 'trivy-results-${{ matrix.arch }}.sarif'
           exit-code: '0'
@@ -372,7 +372,7 @@ jobs:
           image-ref: '${{ env.IMAGE_NAME }}:ci-candidate-${{ matrix.arch }}'
           format: 'table'
           vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
           ignore-unfixed: true
           exit-code: '1'
 
@@ -382,7 +382,7 @@ jobs:
           ARCH: ${{ matrix.arch }}
         run: |
           set -euo pipefail
-          grype "sbom:sbom-${ARCH}.spdx.json" --only-fixed --fail-on high -o table | tee "grype-report-${ARCH}.txt"
+          grype "sbom:sbom-${ARCH}.spdx.json" --only-fixed --fail-on negligible -o table | tee "grype-report-${ARCH}.txt"
 
       - name: Log in to GHCR for verified per-arch digest staging
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
@@ -643,7 +643,7 @@ jobs:
           - **Go toolchain:** \`${{ needs.resolve.outputs.go_version }}\`
           - **Base OS:** Debian \`${DEBIAN_VER}\` (\`trixie-slim\`)
           - **Architectures:** \`linux/amd64\` (${AMD64_MB} MB), \`linux/arm64\` (${ARM64_MB} MB)
-          - **Security gate:** 0 fixable Critical/High (Trivy + Grype on SPDX SBOM), Dive efficiency >= 95%
+          - **Security gate:** 0 fixable findings of any severity (Trivy + Grype on SPDX SBOM), Dive efficiency >= 95%
 
           ### Identical Multi-Arch Digests
           - **GHCR:** \`ghcr.io/${IMAGE_NAME}@${INDEX_DIGEST}\`

@@ -45,7 +45,7 @@ A source-built, multi-arch, rootless container image for **Cloudflare Tunnel (`c
 | Published multi-arch digest | `dgcosenza/cloudflared@sha256:da77bb216647a3f63c606ba743698f438f6a37051761e476c1dbfeda0a6417b8` |
 | GHCR mirror | `ghcr.io/dgcosenza/cloudflared@sha256:da77bb216647a3f63c606ba743698f438f6a37051761e476c1dbfeda0a6417b8` |
 | Supply chain | Cosign OIDC signed + SPDX & CycloneDX SBOM attestations + SLSA Build L3 provenance |
-| Security gate (Trivy + Grype on SBOM) | **0 fixable Critical/High** (13 upstream-unfixed) |
+| Security gate (Trivy + Grype on SBOM) | **0 fixable findings of any severity** (13 upstream-unfixed) |
 <!-- versions:end -->
 
 ---
@@ -218,8 +218,8 @@ gh attestation verify oci://ghcr.io/dgcosenza/cloudflared:latest --owner dgcosen
 ## Security
 
 - **Preflight gates:** Every push and PR runs **Hadolint** (blocking on warning+), **Gitleaks** secret scanning across git history, and **public-content/attribution** checks.
-- **Vulnerability scan policy:** Every build generates **SPDX** and **CycloneDX** SBOMs with **Syft** per architecture, scans with **Trivy** (table, JSON, SARIF upload to GitHub Code Scanning, and blocking `--ignore-unfixed` gate) and **Grype** scanning the generated SPDX SBOM (`--only-fixed`, severity cutoff `high`, blocking gate), and enforces a **Dive** efficiency gate (`>= 95%`, `<= 5%` wasted space). Publication is blocked on any fixable `CRITICAL` or `HIGH` finding.
-- **Current status:** **0 fixable Critical/High** vulnerabilities across Debian 13 OS packages and compiled Go modules. Any upstream-unfixed advisories (if present) are recorded in CI artifacts (`trivy-report-*`) and automatically cleared on daily rebuilds once fixes are published.
+- **Vulnerability scan policy (all severities with a fix):** Every build generates **SPDX** and **CycloneDX** SBOMs with **Syft** per architecture, scans with **Trivy** (table, JSON, SARIF upload to GitHub Code Scanning, and blocking `--ignore-unfixed` gate) and **Grype** scanning the generated SPDX SBOM (`--only-fixed`, severity cutoff `negligible`, blocking gate), and enforces a **Dive** efficiency gate (`>= 95%`, `<= 5%` wasted space). Publication is blocked on any fixable finding of any severity.
+- **Current status:** **0 fixable findings of any severity** vulnerabilities across Debian 13 OS packages and compiled Go modules. Any upstream-unfixed advisories (if present) are recorded in CI artifacts (`trivy-report-*`) and automatically cleared on daily rebuilds once fixes are published.
 - **Dependency automation:** Renovate (`renovate.json`) pins base image digests and GitHub Action commit SHAs; Dependabot security alerts and OpenSSF Scorecard monitoring are enabled.
 - See [`SECURITY.md`](https://github.com/dgcosenza/cloudflared-docker/blob/main/SECURITY.md) for reporting guidelines.
 
@@ -258,7 +258,7 @@ docker buildx build \
 
 1. **Preflight & upstream check:** Runs public-content checks, **Hadolint**, and **Gitleaks**; queries the latest official `cloudflare/cloudflared` release via the authenticated GitHub API, resolves the latest stable Go and `debian:trixie-slim` digests, diffs against `versions.json`, and emits `upstream-changes.md`.
 2. **Multi-arch no-cache rebuild:** Builds natively on `linux/amd64` and `linux/arm64` runners with `--no-cache` on schedule, compiles `cloudflared` and `cloudflared-healthcheck` from source, and upgrades all Debian 13 packages (`apt-get update && apt-get -y upgrade`).
-3. **Smoke, Dive & vulnerability gates:** Runs [`tests/smoke.sh`](https://github.com/dgcosenza/cloudflared-docker/blob/main/tests/smoke.sh) natively on both architectures (`--read-only --cap-drop ALL`), enforces the **Dive** efficiency gate (`>= 95%`), generates **Syft** SPDX + CycloneDX SBOMs per arch, and gates publication on **0 fixable Critical/High** in both **Trivy** (SARIF + JSON + table) and **Grype** (scanning the SPDX SBOM).
+3. **Smoke, Dive & vulnerability gates:** Runs [`tests/smoke.sh`](https://github.com/dgcosenza/cloudflared-docker/blob/main/tests/smoke.sh) natively on both architectures (`--read-only --cap-drop ALL`), enforces the **Dive** efficiency gate (`>= 95%`), generates **Syft** SPDX + CycloneDX SBOMs per arch, and gates publication on **0 fixable findings of any severity** in both **Trivy** (SARIF + JSON + table) and **Grype** (scanning the SPDX SBOM).
 4. **Dual-registry publish & supply-chain signing:** Assembles the multi-arch OCI manifest index on **GHCR** (`ghcr.io/dgcosenza/cloudflared`) and mirrors the identical digest to **Docker Hub** (`dgcosenza/cloudflared`) with tags `latest`, `<version>`, `<version>-<YYYYMMDD>`, and `sha-<short>`; signs every digest and attaches SPDX/CycloneDX SBOM attestations via **Cosign** keyless OIDC; emits **SLSA Build L3** provenance via `actions/attest-build-provenance`; and publishes a signed **GitHub Release** with checksums, Cosign bundle, and SBOMs.
 5. **Automated documentation sync:** Commits updated `versions.json`, the README `Current Versions` block, and a dated `CHANGELOG.md` entry (upstream changes, resolved CVEs, sizes, and digest) via `github-actions[bot]` with `[skip ci]` when content changes, then syncs the Docker Hub repository overview and short description via `peter-evans/dockerhub-description`.
 6. **Failure alerting:** If any job fails on `main` or a scheduled run, CI opens or updates a single GitHub issue labeled `ci-failure` with the failing job and run link, and automatically closes it on the next green run.
